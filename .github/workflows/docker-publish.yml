@@ -52,13 +52,17 @@ jobs:
         run: |
           REPO_BASE=ghcr.io/${{ github.repository_owner }}/
           # Change all uppercase to lowercase
-          REPO_BASE=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-
+          REPO_BASE=$(echo $REPO_BASE | tr '[A-Z]' '[a-z]')
+          echo REPO_BASE=$REPO_BASE
           make deploy REPO=$REPO_BASE
-          
+
       - name: Log into Docker Registry
         run: echo "${{ secrets.DOCKER_TOKEN }}" | docker login  -u "${{ secrets.DOCKER_USER }}" --password-stdin
 
       - name: Push image to Docker Registry
         run: |
-          make deploy
+          REPO_BASE=${{ secrets.DOCKER_USER }}/
+          # Change all uppercase to lowercase
+          REPO_BASE=$(echo $REPO_BASE | tr '[A-Z]' '[a-z]')
+          echo REPO_BASE=$REPO_BASE
+          make deploy REPO=$REPO_BASE
