@@ -23,5 +23,7 @@ clean:
 	docker image ls|grep none|sed -e "s/\s\s*/ /g"|cut -d ' ' -f3|xargs docker rmi ${IMAGE_TOBUILD}
 
 deploy:
+	docker tag ${IMAGE_NAME} ${REPO}${IMAGE_TOBUILD}
+	docker tag ${IMAGE_NAME} ${REPO}${IMAGE_NAME}
 	docker push ${REPO}${IMAGE_TOBUILD}
 	docker push ${REPO}${IMAGE_NAME}
