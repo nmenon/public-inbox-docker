@@ -1,0 +1,3 @@
+[submodule "public-inbox"]
+	path = public-inbox
+	url = https://public-inbox.org/public-inbox.git
