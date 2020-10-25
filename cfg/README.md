@@ -9,6 +9,21 @@ So, this does look a bit convoluted..
 
 ![Flow](flow.png)
 
+public-inbox config file
+========================
+
+public-inbox.config is actually file /data/public-inbox/config/config mapped over to /workdir/.public-inbox/config
+
+you can create your own version of the file for example:
+Example:
+
+```
+ public-inbox-init -V2 -L full --ng inbox.linux-patch-review --skip-artnum 1 --skip-epoch 1 "linux-patch-review" /git-repos/linux-patch-review.git http://example.com/lore/linux-patch-review/ linux-patch-review@example.com
+```
+
+This would initalize the git repos and make it ready to recieve emails, etc..
+but will be missing many additional configurations that you may need to hand edit
+in.. esp if you are handling emails from imap server.
 
 mbsync config files
 ===================
