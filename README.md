@@ -52,3 +52,8 @@ docker run -it --rm -p  8080:8080 -v /tmp:/tmp public-inbox /usr/local/bin/publi
 ```
 
 voila you have localhost:8080 a quick taste of what is here.
+
+Wrappers and examples to get started:
+------------------------------------
+* [Wrapper scripts and cron wrappers for pubic-inbox](bin/README.md)
+* [pubic-inbox and mbsync configurations](cfg/README.md)

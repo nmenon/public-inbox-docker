@@ -1,0 +1,29 @@
+# An  example
+#
+# First generic defaults
+Create Slave
+SyncState *
+
+MaildirStore imap-store
+# The trailing "/" is important
+Path /data/mailing_list_emails/original/
+Inbox /data/mailing_list_emails/original/INBOX
+Subfolders Verbam
+
+MaildirStore pw-store
+# The trailing "/" is important
+Path /data/mailing_list_emails/patchworks/
+Inbox /data/mailing_list_emails/patchworks/INBOX
+Subfolders Verbam
+
+# Channels / AKA Folders
+
+#---- Base folders
+Channel main-Inbox
+Master :imap-store:"INBOX"
+Slave :pw-store:INBOX
+Sync Full
+Expunge Both
+
+Group main
+Channels main-Inbox

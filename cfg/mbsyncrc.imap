@@ -1,0 +1,39 @@
+# An  example
+#
+# First generic defaults
+Create Slave
+SyncState *
+
+IMAPAccount remote
+Host example.com
+User username
+Pass password
+AuthMechs LOGIN
+SSLType IMAPS
+SSLVersions TLSv1.2
+CerficateFile /etc/ssl/certs/ca-cerficates.crt
+
+# Throttle mbsync so we don't go over 's quota: OVERQUOTA error would
+# eventually be returned otherwise. For more details see:
+# https://sourceforge.net/p/isync/mailman/message/35458365/
+#PipelineDepth 50
+
+MaildirStore local
+# The trailing "/" is important
+Path /data/mailing_list_emails/original
+Inbox /data/mailing_list_emails/original/INBOX
+Subfolders Verbam
+
+IMAPStore remote
+Account remote
+# Channels / AKA Folders
+
+#---- Base folders
+Channel main-Inbox
+Master :remote:"INBOX"
+Slave :local:INBOX
+Sync Full
+Expunge Both
+
+Group main
+Channels main-Inbox
