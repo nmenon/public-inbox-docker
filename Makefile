@@ -3,7 +3,7 @@
 # https://public-inbox.org/public-inbox.git
 PBI_VERSION = 1.6.0
 # https://git.kernel.org/pub/scm/git/git.git/
-GIT_VERSION = 2.29.1
+GIT_VERSION = 2.30.0
 IMAGE_NAME ?= public-inbox
 IMAGE_TOBUILD=${IMAGE_NAME}:${PBI_VERSION}
 
