@@ -9,7 +9,7 @@ NPROC=`nproc`
 if [ -n "$PBI_VERSION" ]; then
 	export GIT_TAG=$PBI_VERSION
 else
-	export GIT_TAG=1.6.0
+	export GIT_TAG=1.6.1
 fi
 
 download_build_install_public_inbox()
