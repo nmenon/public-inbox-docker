@@ -9,7 +9,7 @@ NPROC=`nproc`
 if [ -n "$GIT_VERSION" ]; then
 	export GIT_TAG=$GIT_VERSION
 else
-	export GIT_TAG=2.30.1
+	export GIT_TAG=2.31.1
 fi
 
 
