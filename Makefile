@@ -1,9 +1,9 @@
 .PHONY: all
 
 # https://public-inbox.org/public-inbox.git
-PBI_VERSION = 1.6.1
+PBI_VERSION = 1.7.0
 # https://git.kernel.org/pub/scm/git/git.git/
-GIT_VERSION = 2.31.1
+GIT_VERSION = 2.33.1
 IMAGE_NAME ?= public-inbox
 IMAGE_TOBUILD=${IMAGE_NAME}:${PBI_VERSION}
 
