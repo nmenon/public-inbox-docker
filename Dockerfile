@@ -1,4 +1,6 @@
-FROM debian:stable-slim
+ARG BASE_DISTRO=SPECIFY_ME
+
+FROM $BASE_DISTRO
 
 ARG USER_UID=SPECIFY_ME
 ARG PBI_VERSION=SPECIFY_ME
@@ -41,7 +43,7 @@ RUN  PBI_VERSION=$PBI_VERSION /tmp/build-public-inbox.sh
 
 RUN cp -rvfa /usr/local /opt/local
 
-FROM debian:stable-slim
+FROM $BASE_DISTRO
 
 ARG USER_UID=SPECIFY_ME
 

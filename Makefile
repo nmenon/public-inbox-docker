@@ -6,6 +6,7 @@ PBI_VERSION = 1.7.0
 GIT_VERSION = 2.33.1
 IMAGE_NAME ?= public-inbox
 IMAGE_TOBUILD=${IMAGE_NAME}:${PBI_VERSION}
+BASE_DISTRO ?= debian:stable-slim
 
 REPO ?=
 USER_ID ?=$(shell id -u)
@@ -13,6 +14,7 @@ USER_ID ?=$(shell id -u)
 all:
 	docker build -t ${IMAGE_TOBUILD} \
 		--build-arg USER_UID=${USER_ID} \
+		--build-arg BASE_DISTRO=${BASE_DISTRO} \
 		--build-arg PBI_VERSION=${PBI_VERSION} \
 		--build-arg GIT_VERSION=${GIT_VERSION} \
 		--pull .
