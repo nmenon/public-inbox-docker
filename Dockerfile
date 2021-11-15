@@ -29,7 +29,7 @@ RUN  export DEBIAN_FRONTEND=noninteractive;\
 			    xapian-tools libencode-perl libdbi-perl libperl5.32 \
 			    liblinux-inotify2-perl perl-modules libio-compress-perl \
 			    libsocket6-perl libcrypt-cbc-perl libplack-test-agent-perl \
-			    perl-modules-5.32 libxml-treepp-perl spamassassin
+			    perl-modules-5.32 libxml-treepp-perl spamassassin man-db
 
 COPY other-configs/ /
 COPY other-configs/ /opt/other-configs
@@ -70,7 +70,7 @@ RUN  export DEBIAN_FRONTEND=noninteractive;apt-get update;\
 			    xapian-tools libencode-perl libdbi-perl libperl5.32 \
 			    liblinux-inotify2-perl perl-modules libio-compress-perl \
 			    libsocket6-perl libcrypt-cbc-perl libplack-test-agent-perl \
-			    perl-modules-5.32 libxml-treepp-perl spamassassin \
+			    perl-modules-5.32 libxml-treepp-perl spamassassin man-db\
 			    && \
 	apt-get clean && \
 	rm -rf /var/lib/apt/lists/*
