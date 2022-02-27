@@ -3,7 +3,7 @@
 # https://public-inbox.org/public-inbox.git
 PBI_VERSION = 1.7.0
 # https://git.kernel.org/pub/scm/git/git.git/
-GIT_VERSION = 2.33.1
+GIT_VERSION = 2.35.1
 IMAGE_NAME ?= public-inbox
 IMAGE_TOBUILD=${IMAGE_NAME}:${PBI_VERSION}
 BASE_DISTRO ?= debian:stable-slim

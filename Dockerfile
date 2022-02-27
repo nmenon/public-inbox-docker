@@ -49,6 +49,8 @@ ARG USER_UID=SPECIFY_ME
 
 USER root
 
+LABEL org.opencontainers.image.source https://github.com/nmenon/public-inbox-docker
+
 #--- PROXY SETUP START
 #COPY proxy-configuration/ /
 #RUN  export DEBIAN_FRONTEND=noninteractive;apt-get update;apt-get install -y apt-transport-https socket corkscrew apt-utils
