@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DOCKER_NAME="nishanthmenon/public-inbox:latest"
+DOCKER_NAME="ghcr.io/nmenon/public-inbox:latest"
 SERVER_NAME="pib-nntpd"
 
 source `dirname $0`/docker_2include_pib.sh

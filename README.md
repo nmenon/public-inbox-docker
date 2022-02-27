@@ -38,17 +38,27 @@ Build commands:
 Using Docker Image
 ==================
 
-* If you want to want to use prebuild version deployed in Docker-hub
+* If you want to want to use prebuild version deployed in:
+
+github Container registry:
+
+```
+docker pull ghcr.io/nmenon/public-inbox
+
+```
+
+OR dockerhub:
 
 ```
 docker pull nishanthmenon/public-inbox
 
 ```
 
+
 * If you want to run the httpd
 
 ```
-docker run -it --rm -p  8080:8080 -v /tmp:/tmp public-inbox /usr/local/bin/public-inbox-httpd
+docker run -it --rm -p  8080:8080 -v /tmp:/tmp ghcr.io/nmenon/public-inbox /usr/local/bin/public-inbox-httpd
 ```
 
 voila you have localhost:8080 a quick taste of what is here.
