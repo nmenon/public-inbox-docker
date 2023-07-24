@@ -65,5 +65,5 @@ voila you have localhost:8080 a quick taste of what is here.
 
 Wrappers and examples to get started:
 ------------------------------------
-* [Wrapper scripts and cron wrappers for pubic-inbox](bin/README.md)
-* [pubic-inbox and mbsync configurations](cfg/README.md)
+* [Wrapper scripts and cron wrappers for public-inbox](bin/README.md)
+* [public-inbox and mbsync configurations](cfg/README.md)
