@@ -28,10 +28,10 @@ RUN  export DEBIAN_FRONTEND=noninteractive;\
 			    libsearch-xapian-perl libnet-server-perl \
 			    libinline-c-perl libemail-address-xs-perl \
 			    libplack-middleware-reverseproxy-perl libhighlight-perl \
-			    xapian-tools libencode-perl libdbi-perl libperl5.32 \
+			    xapian-tools libencode-perl libdbi-perl libperl5.36 \
 			    liblinux-inotify2-perl perl-modules libio-compress-perl \
 			    libsocket6-perl libcrypt-cbc-perl libplack-test-agent-perl \
-			    perl-modules-5.32 libxml-treepp-perl spamassassin man-db
+			    perl-modules-5.36 libxml-treepp-perl spamassassin man-db
 
 COPY other-configs/ /
 COPY other-configs/ /opt/other-configs
@@ -71,10 +71,10 @@ RUN  export DEBIAN_FRONTEND=noninteractive;apt-get update;\
 			    libsearch-xapian-perl libnet-server-perl \
 			    libinline-c-perl libemail-address-xs-perl \
 			    libplack-middleware-reverseproxy-perl libhighlight-perl \
-			    xapian-tools libencode-perl libdbi-perl libperl5.32 \
+			    xapian-tools libencode-perl libdbi-perl libperl5.36 \
 			    liblinux-inotify2-perl perl-modules libio-compress-perl \
 			    libsocket6-perl libcrypt-cbc-perl libplack-test-agent-perl \
-			    perl-modules-5.32 libxml-treepp-perl spamassassin man-db\
+			    perl-modules-5.36 libxml-treepp-perl spamassassin man-db\
 			    && \
 	apt-get clean && \
 	rm -rf /var/lib/apt/lists/*
