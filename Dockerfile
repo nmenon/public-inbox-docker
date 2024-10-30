@@ -31,7 +31,8 @@ RUN  export DEBIAN_FRONTEND=noninteractive;\
 			    xapian-tools libencode-perl libdbi-perl libperl5.36 \
 			    liblinux-inotify2-perl perl-modules libio-compress-perl \
 			    libsocket6-perl libcrypt-cbc-perl libplack-test-agent-perl \
-			    perl-modules-5.36 libxml-treepp-perl spamassassin man-db less
+			    perl-modules-5.36 libxml-treepp-perl spamassassin man-db less \
+			    public-inbox lei
 
 COPY other-configs/ /
 COPY other-configs/ /opt/other-configs
