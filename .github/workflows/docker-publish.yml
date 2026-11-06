@@ -2,53 +2,107 @@ name: Docker Image CI
 
 on:
   push:
-    # Publish `main` as Docker `latest` image.
     branches:
       - main
-
-    # Publish `v1.2.3` tags as releases.
     tags:
       - v*
-
-  # Run tests for any PRs.
   pull_request:
-
-env:
-  IMAGE_NAME: public-inbox
+  schedule:
+    - cron: '0 8 * * 0'
+  workflow_dispatch:
 
 jobs:
-  # Push image to GitHub Packages.
-  # See also https://docs.docker.com/docker-hub/builds/
   push:
-
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+    if: github.event_name != 'pull_request'
+    permissions:
+      contents: write
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: Resolve upstream build
+        id: upstream
+        shell: bash
+        env:
+          STATE_FILE: .github/public-inbox-upstream-state
+        run: |
+          set -euo pipefail
+          upstream_url=https://public-inbox.org/public-inbox.git
+          tag="$(git ls-remote --tags --refs "$upstream_url" 'refs/tags/v*' | ./scripts/latest-public-inbox-tag.sh)"
+          git -C public-inbox fetch --depth=1 origin "refs/tags/$tag"
+          release_sha="$(git -C public-inbox rev-parse 'FETCH_HEAD^{commit}')"
+          head_info="$(git ls-remote --symref "$upstream_url" HEAD)"
+          head_ref="$(awk '$1 == "ref:" && $3 == "HEAD" { print $2; exit }' <<< "$head_info")"
+          [[ $head_ref == refs/heads/* ]] || { echo 'Upstream HEAD did not resolve to a branch' >&2; exit 1; }
+          git -C public-inbox fetch --depth=1 origin "$head_ref"
+          upstream_head="$(git -C public-inbox rev-parse 'FETCH_HEAD^{commit}')"
+          plan="$(./scripts/plan-public-inbox-build.sh "$GITHUB_EVENT_NAME" "$STATE_FILE" "$tag" "$release_sha" "$upstream_head")"
+          mode=
+          source_sha=
+          while IFS='=' read -r key value; do
+            echo "$key=$value" >> "$GITHUB_OUTPUT"
+            case $key in
+              mode) mode=$value ;;
+              source_sha) source_sha=$value ;;
+            esac
+          done <<< "$plan"
+          if [[ $mode != skip ]]; then
+            git -C public-inbox checkout --detach "$source_sha"
+          fi
 
       - name: Build image
-        run: |
-            make USER_ID=1000
+        if: steps.upstream.outputs.mode != 'skip'
+        env:
+          PBI_VERSION: ${{ steps.upstream.outputs.source_sha }}
+          PBI_SOURCE: checkout
+          IMAGE_VERSION: ${{ steps.upstream.outputs.image_version }}
+          PUBLISH_VERSION_TAG: ${{ steps.upstream.outputs.publish_version_tag }}
+        run: make USER_ID=1000 PBI_VERSION="$PBI_VERSION" PBI_SOURCE="$PBI_SOURCE" IMAGE_VERSION="$IMAGE_VERSION" PUBLISH_VERSION_TAG="$PUBLISH_VERSION_TAG" DOCKER_BUILD_ARGS=--no-cache
 
       - name: Log into GitHub Container Registry
+        if: steps.upstream.outputs.mode != 'skip'
         run: echo "${{ secrets.CR_PAT }}" | docker login https://ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Push image to GitHub Container Registry
+        if: steps.upstream.outputs.mode != 'skip'
+        env:
+          IMAGE_VERSION: ${{ steps.upstream.outputs.image_version }}
+          PUBLISH_VERSION_TAG: ${{ steps.upstream.outputs.publish_version_tag }}
         run: |
           REPO_BASE=ghcr.io/${{ github.repository_owner }}/
-          # Change all uppercase to lowercase
           REPO_BASE=$(echo $REPO_BASE | tr '[A-Z]' '[a-z]')
-          echo REPO_BASE=$REPO_BASE
-          make deploy REPO=$REPO_BASE
+          make deploy REPO=$REPO_BASE IMAGE_VERSION="$IMAGE_VERSION" PUBLISH_VERSION_TAG="$PUBLISH_VERSION_TAG"
 
       - name: Log into Docker Registry
-        run: echo "${{ secrets.DOCKER_TOKEN }}" | docker login  -u "${{ secrets.DOCKER_USER }}" --password-stdin
+        if: steps.upstream.outputs.mode != 'skip'
+        run: echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u "${{ secrets.DOCKER_USER }}" --password-stdin
 
       - name: Push image to Docker Registry
+        if: steps.upstream.outputs.mode != 'skip'
+        env:
+          IMAGE_VERSION: ${{ steps.upstream.outputs.image_version }}
+          PUBLISH_VERSION_TAG: ${{ steps.upstream.outputs.publish_version_tag }}
         run: |
           REPO_BASE=${{ secrets.DOCKER_USER }}/
-          # Change all uppercase to lowercase
           REPO_BASE=$(echo $REPO_BASE | tr '[A-Z]' '[a-z]')
-          echo REPO_BASE=$REPO_BASE
-          make deploy REPO=$REPO_BASE
+          make deploy REPO=$REPO_BASE IMAGE_VERSION="$IMAGE_VERSION" PUBLISH_VERSION_TAG="$PUBLISH_VERSION_TAG"
+
+      - name: Persist successful upstream state
+        if: steps.upstream.outputs.mode != 'skip' && github.ref_type == 'branch' && (github.event_name == 'schedule' || github.ref_name == github.event.repository.default_branch)
+        env:
+          STATE_FILE: .github/public-inbox-upstream-state
+          STATE_TAG: ${{ steps.upstream.outputs.next_tag }}
+          STATE_HEAD: ${{ steps.upstream.outputs.next_head }}
+        run: |
+          set -euo pipefail
+          printf '%s %s\n' "$STATE_TAG" "$STATE_HEAD" > "$STATE_FILE"
+          git add public-inbox "$STATE_FILE"
+          if ! git diff --cached --quiet -- public-inbox "$STATE_FILE"; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m "Update public-inbox upstream state"
+            git push origin "HEAD:$GITHUB_REF"
+          fi

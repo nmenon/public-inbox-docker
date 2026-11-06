@@ -30,6 +30,8 @@ Dependency to build docker is:
 * docker.io
 * proxy settings for docker to pull in required images
 
+Initialize the public-inbox submodule before building: git submodule update --init public-inbox.
+
 Build commands:
 * make : build image public-inbox
 * make clean : I strongly recommend NOT to use my version if you have other docker images running in your system.
@@ -67,3 +69,15 @@ Wrappers and examples to get started:
 ------------------------------------
 * [Wrapper scripts and cron wrappers for public-inbox](bin/README.md)
 * [public-inbox and mbsync configurations](cfg/README.md)
+
+
+Automated upstream refresh
+==========================
+
+Every Sunday at 08:00 UTC (and on manual dispatch), the workflow compares the highest stable public-inbox tag with the last successfully published tag and resolves upstream HEAD through its advertised symbolic branch, without assuming a branch name.
+
+A new stable tag takes priority: build its exact submodule commit and publish the version without v plus latest. Otherwise, a changed upstream HEAD is built from the checked-out submodule and publishes latest only; unchanged state skips build and publish.
+
+The tracked state file .github/public-inbox-upstream-state stores the last successfully published tag and the last scheduled/manual upstream HEAD separately from the gitlink. State and gitlink advance only after both registry publishes succeed, so failed runs retry; missing state bootstraps with a release build. Default-branch push runs still publish the latest stable release and retain the weekly HEAD checkpoint. The workflow uses the existing CR_PAT, DOCKER_USER, and DOCKER_TOKEN secrets.
+
+The repository must allow GitHub Actions to push to the default branch; branch protection rules that block the workflow's GITHUB_TOKEN push prevent automatic gitlink updates. That push does not trigger another workflow run.

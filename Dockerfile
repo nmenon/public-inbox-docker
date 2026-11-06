@@ -4,6 +4,7 @@ FROM $BASE_DISTRO
 
 ARG USER_UID=SPECIFY_ME
 ARG PBI_VERSION=SPECIFY_ME
+ARG PBI_SOURCE=snapshot
 ARG GIT_VERSION=SPECIFY_ME
 
 USER root
@@ -39,8 +40,9 @@ COPY other-configs/ /opt/other-configs
 COPY build-git.sh /tmp
 RUN  GIT_VERSION=$GIT_VERSION /tmp/build-git.sh
 
+COPY public-inbox /tmp/public-inbox
 COPY build-public-inbox.sh /tmp
-RUN  PBI_VERSION=$PBI_VERSION /tmp/build-public-inbox.sh
+RUN  PBI_VERSION=$PBI_VERSION PBI_SOURCE=$PBI_SOURCE /tmp/build-public-inbox.sh
 
 RUN cp -rvfa /usr/local /opt/local
 
