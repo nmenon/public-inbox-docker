@@ -66,7 +66,7 @@ chown -R swuser:swuser /workdir && mkdir /ccache && chown -R swuser:swuser /ccac
 
 # Git Dependencies
 RUN  export DEBIAN_FRONTEND=noninteractive;apt-get update;\
-			    apt-get install -y build-essential wget gcc \
+			    apt-get install -y build-essential wget gcc curl \
 			    dh-autoreconf libcurl4-gnutls-dev libexpat1-dev \
 			    gettext libz-dev libssl-dev \
 			    liburi-perl libemail-mime-perl \
