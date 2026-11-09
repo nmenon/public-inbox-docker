@@ -36,7 +36,7 @@ image_version=rolling
 publish_version_tag=false
 next_tag=$previous_tag
 next_head=$previous_head
-if [[ $event == push || $has_state == false || $release_tag != "$previous_tag" ]]; then
+if [[ $has_state == false || $release_tag != "$previous_tag" ]]; then
   mode=release
   source_sha=$release_sha
   image_version=${release_tag#v}
@@ -45,10 +45,10 @@ if [[ $event == push || $has_state == false || $release_tag != "$previous_tag" ]
   if [[ $event != push || $has_state == false ]]; then
     next_head=$upstream_head
   fi
-elif [[ $upstream_head != "$previous_head" ]]; then
+elif [[ $event == push || $upstream_head != "$previous_head" ]]; then
   mode=head
   source_sha=$upstream_head
-  next_head=$upstream_head
+  if [[ $event != push ]]; then next_head=$upstream_head; fi
 fi
 
 printf 'mode=%s\nsource_sha=%s\nimage_version=%s\npublish_version_tag=%s\nnext_tag=%s\nnext_head=%s\n' \

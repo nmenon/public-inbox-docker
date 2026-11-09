@@ -31,13 +31,19 @@ has publish_version_tag=true "$plan"
 has next_head=$old_head "$plan"
 [[ ! -e $state ]]
 
-# A new tag wins over a changed HEAD, even when it aliases the same release commit.
+# A new tag wins over changed HEAD on schedule and push, even if it aliases the release commit.
 printf 'v2.9.0 %s\n' "$old_head" > "$state"
 plan=$("$planner" schedule "$state" v2.10.0 "$release_sha" "$new_head")
 has mode=release "$plan"
 has source_sha=$release_sha "$plan"
 has next_tag=v2.10.0 "$plan"
 has next_head=$new_head "$plan"
+plan=$("$planner" push "$state" v2.10.0 "$release_sha" "$new_head")
+has mode=release "$plan"
+has image_version=2.10.0 "$plan"
+has publish_version_tag=true "$plan"
+has next_tag=v2.10.0 "$plan"
+has next_head=$old_head "$plan"
 [[ $(<"$state") == "v2.9.0 $old_head" ]]
 
 # Without a new release, changed upstream HEAD publishes only latest.
@@ -52,15 +58,25 @@ has next_head=$new_head "$plan"
 plan=$("$planner" workflow_dispatch "$state" v2.10.0 "$release_sha" "$new_head")
 has mode=head "$plan"
 
-# Unchanged state skips; ordinary pushes still publish the stable release.
+# An already-published release makes push build upstream HEAD as latest only, preserving the weekly baseline.
+printf 'v2.10.0 %s\n' "$old_head" > "$state"
+plan=$("$planner" push "$state" v2.10.0 "$release_sha" "$new_head")
+has mode=head "$plan"
+has source_sha=$new_head "$plan"
+has image_version=rolling "$plan"
+has publish_version_tag=false "$plan"
+has next_tag=v2.10.0 "$plan"
+has next_head=$old_head "$plan"
+
+# Push rebuilds HEAD even if it equals the saved weekly baseline; schedule skips unchanged HEAD.
+plan=$("$planner" push "$state" v2.10.0 "$release_sha" "$old_head")
+has mode=head "$plan"
+has source_sha=$old_head "$plan"
+has publish_version_tag=false "$plan"
+has next_head=$old_head "$plan"
 printf 'v2.10.0 %s\n' "$new_head" > "$state"
 plan=$("$planner" schedule "$state" v2.10.0 "$release_sha" "$new_head")
 has mode=skip "$plan"
-printf 'v2.10.0 %s\n' "$old_head" > "$state"
-plan=$("$planner" push "$state" v2.10.0 "$release_sha" "$new_head")
-has mode=release "$plan"
-has publish_version_tag=true "$plan"
-has next_head=$old_head "$plan"
 
 release_build=$(make -s -n USER_ID=1000 PBI_VERSION="$release_sha" PBI_SOURCE=checkout IMAGE_VERSION=2.10.0 DOCKER_BUILD_ARGS=--no-cache)
 grep -Fq 'docker build --no-cache -t public-inbox:2.10.0' <<< "$release_build"
