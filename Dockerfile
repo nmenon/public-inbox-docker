@@ -36,15 +36,12 @@ RUN  export DEBIAN_FRONTEND=noninteractive;\
 			    public-inbox lei
 
 COPY other-configs/ /
-COPY other-configs/ /opt/other-configs
 COPY build-git.sh /tmp
 RUN  GIT_VERSION=$GIT_VERSION /tmp/build-git.sh
 
 COPY public-inbox /tmp/public-inbox
 COPY build-public-inbox.sh /tmp
 RUN  PBI_VERSION=$PBI_VERSION PBI_SOURCE=$PBI_SOURCE /tmp/build-public-inbox.sh
-
-RUN cp -rvfa /usr/local /opt/local
 
 FROM $BASE_DISTRO
 
@@ -82,11 +79,10 @@ RUN  export DEBIAN_FRONTEND=noninteractive;apt-get update;\
 	apt-get clean && \
 	rm -rf /var/lib/apt/lists/*
 
-COPY --from=0 /opt /opt
+COPY --from=0 /usr/local /usr/local
+COPY other-configs/ /
 
-RUN cp -rvfa /opt/other-configs/* / && rm -rvf /opt/other-configs/ && \
-    cp -rvfa /opt/local/* /usr/local/ && rm -rf /opt/local && \
-    ldconfig /usr/local/lib
+RUN ldconfig /usr/local/lib
 
 USER swuser
 WORKDIR /workdir
